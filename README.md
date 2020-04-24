@@ -16,6 +16,9 @@ This little set of scripts makes sure your rig monitors the proof-of-work
 (PoW) start time, and when required stops your main miner, fires up the
 ZIL miner, and switches back to your main miner afterwards.
 
+We're not utilizing the 'native' Zilliqa mining setup here. Instead a
+mining pool will be used for simplicity.
+
 In the background a script checks the block height of the ZIL blockchain
 every this and then in a loop by calling the Zilliqa API in a decreasing
 interval. Once the block 99 is hit, the background sleep stops, the main
@@ -38,13 +41,85 @@ You need to own a wallet address for ZIL.
 
 ### Installation
 
-Run the following command in your ethOS shell:
+Run the following commands in your ethOS shell:
 
 ```
-bash <(curl -s https://raw.githubusercontent.com/71ae/crypto-zil-miner-switch-ethos/ZIL-1/install-zil.sh)
+bash <(curl -s https://raw.githubusercontent.com/71ae/crypto-zil-miner-switch-ethos/v1.3/install-zil.sh)
 ```
 
-#### Utilization
+### Configuration
+
+After the installation please edit the pool and wallet configuration!
+```
+nano zil-miner-switch/minerpool.txt
+```
+
+After you've done this, you can start this toolsuite with:
+```
+bash zil-miner-switch/zil-init.sh
+```
+
+To make sure the ZIL Mining Switcher also starts when you power on your rig,
+you also can add the following line into custom.sh (execute `nano custom.sh`)
+before the "exit" line:
+```
+bash -c zil-miner-switch/zil-init.sh
+```
+
+### Upgrading
+
+If you already have this ZIL Mining Switch tool installed before,
+it's recommended to make a backup of the config files `minerpool.txt`
+and `mineropts.txt` before upgrading. The installer tries to keep them
+untouched, though.
+
+Some upgrades may come with changes in the mineropts. To make sure to
+use the latest options you may want to remove the file (after you've
+taken a backup):
+```
+rm zil-miner-switch/mineropts.txt
+```
+
+For upgrading just run the installer command again.
+```
+bash <(curl -s https://raw.githubusercontent.com/71ae/crypto-zil-miner-switch-ethos/v1.3/install-zil.sh)
+```
+
+### Verification
+
+To verify that this toolsuite is running, you can fire this command:
+```
+pgrep -fl zil
+```
+The output should show exactly these three commands (the numbers in front
+are irrelevant):
+```
+3415 screen
+3419 zil-loop.sh
+18251 perl
+```
+
+Further more, to keep an eye on what these scripts actually are doing,
+we're writing a tiny log file that you can tail with this command
+(exit with `Ctrl-c`):
+```
+tail -f /tmp/zil-switch.log
+```
+
+If you are an experienced user, you may enter into the background screen:
+```
+screen -r zil
+```
+Make sure to exit this screen with `Ctrl-a d`. Do not keep it open for
+longer than necessary, and do NOT do a `Ctrl-c` here as this likely would
+stop the switcher.
+
+### Farms
+
+You are limited to installing 15 miners an hour as this script makes
+4 GitHub calls per install. Use authenticated requests if you require more.
+
+## Utilization
 
 For running this script we're making use of the following components:
 
@@ -56,30 +131,6 @@ For running this script we're making use of the following components:
 
 The installation script makes sure that these tools are installed, if
 they aren't part of ethOS yet.
-
-### Configuration
-
-After the installation please edit the pool and wallet configuration!
-```
-nano zil-miner-switch/minerpool.txt
-```
-
-After you've done this, you can start this toolsuite with:
-```
-sh zil-miner-switch/zil-init.sh
-```
-
-To make sure the ZIL Mining Switcher also starts when you power on your rig,
-you also can add the following line into custom.sh (execute `nano custom.sh`)
-before the "exit" line:
-```
-bash -c zil-miner-switch/zil-init.sh
-```
-
-### Farms
-
-You are limited to installing 15 miners an hour as this script makes
-4 GitHub calls per install. Use authenticated requests if you require more.
 
 ## Author
 
